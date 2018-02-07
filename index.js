@@ -18,14 +18,17 @@ const h = 40;
 
 rl.question('Enter start configuration: ', (data) => {
     const field = createField(w, h);
-    
-    prepareField(field, data);
-    draw(field);
-    setInterval(() => {
-        makeLifecycle(field);
-        console.clear();
+    const isvalid = prepareField(field, data);
+    if (isvalid) {
         draw(field);
-    }, 100);
+        setInterval(() => {
+            makeLifecycle(field);
+            console.clear();
+            draw(field);
+        }, 100);
+    } else {
+        console.log('Invalid configuration');
+    }
     rl.close();
 })
 
@@ -69,13 +72,35 @@ function isAlive(x, y, arr) {
 }
 
 function prepareField(field, data) {
+    if (data.trim() == 'rand') {
+        let r = Math.random() * 1000;
+        for (let i = 0; i < r; i++) {
+            let x = Math.floor(Math.random() * 100);
+            let y = Math.floor(Math.random() * 100);
+            x %= w;
+            y %= h;
+            field[y][x] = lifecell;
+        }
+
+        return true;
+    }
     numbs = data.split(' ');
-    let n = +numbs[0];
-    let ind = 1;
-    for (let i = 0; i < n; i++) {
-        let x = +numbs[ind++];
-        let y = +numbs[ind++];
-        field[y][x] = lifecell;
+    try {
+        let n = +numbs[0];
+        if (isNaN(n) || n == 0) {
+            return false;
+        }
+        let ind = 1;
+        for (let i = 0; i < n; i++) {
+            let x = +numbs[ind++];
+            let y = +numbs[ind++];
+            field[y][x] = lifecell;
+        }
+
+        return true;
+    }
+    catch (err) {
+        return false;
     }
 }
 
